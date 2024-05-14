@@ -34,7 +34,6 @@ public class QuizletApp extends JFrame {
         headerLabel.setFont(new Font("Arial", Font.BOLD, 24));
         add(headerLabel);
 
-        // Input Panel for adding flashcards
         inputPanel = new JPanel();
         inputPanel.setLayout(new FlowLayout());
 
@@ -56,7 +55,6 @@ public class QuizletApp extends JFrame {
         inputPanel.add(backPanel);
         add(inputPanel);
 
-        // Flashcard Panel to display flashcards
         flashcardPanel = new JPanel();
         flashcardPanel.setLayout(new BorderLayout());
 
@@ -75,7 +73,6 @@ public class QuizletApp extends JFrame {
 
         add(flashcardPanel);
 
-        // Initialize startStudyButton and stopStudyButton
         startStudyButton = new JButton("Start Study");
         stopStudyButton = new JButton("Stop Study");
 
@@ -89,20 +86,16 @@ public class QuizletApp extends JFrame {
 
         add(studyMethodPanel);
 
-        // Initialize the flashcard list model
         listModel = new DefaultListModel<>();
         flashcardList = new JList<>(listModel);
 
-        // Add flashcard list to the frame
         JScrollPane listScrollPane = new JScrollPane(flashcardList);
         listScrollPane.setPreferredSize(new Dimension(200, 400));
         add(listScrollPane);
 
-        // Initialize addFlashcardButton and add ActionListener
         addFlashcardButton = new JButton("Add Flashcard");
         addFlashcardButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
-                // Add the new flashcard
                 frontSides[currentCardIndex] = frontInput.getText();
                 backSides[currentCardIndex] = backInput.getText();
                 listModel.addElement(frontInput.getText() + " : " + backInput.getText());
@@ -112,7 +105,6 @@ public class QuizletApp extends JFrame {
         });
         inputPanel.add(addFlashcardButton);
 
-        // Action Listeners
         nextFlashcardButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
                 if (studying) {
@@ -134,7 +126,6 @@ public class QuizletApp extends JFrame {
         flipFlashcardButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
                 if (studying) {
-                    // Toggle between showing front and back
                     if (flashcardTextField.getText().equals(frontSides[currentCardIndex])) {
                         flashcardTextField.setText(backSides[currentCardIndex]);
                     } else {
@@ -149,7 +140,7 @@ public class QuizletApp extends JFrame {
                 studying = true;
                 startStudyButton.setEnabled(false);
                 stopStudyButton.setEnabled(true);
-                currentCardIndex = 0; // Reset to first card
+                currentCardIndex = 0;
                 showCurrentCard();
             }
         });
