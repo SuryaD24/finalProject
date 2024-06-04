@@ -1,9 +1,9 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.Random;
 
 public class QuizletApp extends JFrame {
-    private JPanel flashcardPanel;
     private JPanel studyMethodPanel;
     private JPanel inputPanel;
     private JPanel frontPanel;
@@ -17,151 +17,268 @@ public class QuizletApp extends JFrame {
     private JButton startStudyButton;
     private JButton stopStudyButton;
     private JButton addFlashcardButton;
+    private JButton startMultipleChoiceButton;
+    private JButton stopMultipleChoiceButton;
     private JLabel headerLabel;
+    private JPanel multipleChoicePanel;
+    private JLabel questionLabel;
+    private JButton[] answerButtons;
+    private JScrollPane listScrollPane;
 
     private String[] frontSides = new String[10];
     private String[] backSides = new String[10];
     private int currentCardIndex = 0;
     private boolean studying = false;
+    private boolean multipleChoiceMode = false;
+
+    private void showCurrentCard() {
+        flashcardTextField.setText(frontSides[currentCardIndex]);
+    }
 
     public QuizletApp() {
+        // Set frame properties
         setTitle("The Better Quizlet");
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLayout(new GridLayout(2, 1));
+        setLayout(new BorderLayout());
 
-        headerLabel = new JLabel("The Better Quizlet", SwingConstants.CENTER);
+        // Create header label with a gradient background
+        headerLabel = new JLabel("The Better Quizlet", SwingConstants.RIGHT);
         headerLabel.setFont(new Font("Arial", Font.BOLD, 24));
-        add(headerLabel);
+        headerLabel.setForeground(Color.WHITE);
+        headerLabel.setOpaque(true);
+        headerLabel.setBackground(new Color(70, 130, 180)); // Steel Blue
+        add(headerLabel, BorderLayout.NORTH);
 
-        inputPanel = new JPanel();
-        inputPanel.setLayout(new FlowLayout());
+        // Main panels
+        JPanel leftPanel = new JPanel(new BorderLayout());
+        JPanel centerPanel = new JPanel(new BorderLayout());
+        JPanel rightPanel = new JPanel(new BorderLayout());
+        JPanel bottomPanel = new JPanel(new BorderLayout());
 
-        frontPanel = new JPanel();
-        frontPanel.setLayout(new BorderLayout());
+        // Input Panel (Right) - Light green background
+        inputPanel = new JPanel(new BorderLayout());
+        inputPanel.setBackground(new Color(230, 255, 230)); // Light green
+
+        frontPanel = new JPanel(new BorderLayout());
+        frontPanel.setBackground(new Color(230, 255, 230)); // Light green
         JLabel frontLabel = new JLabel("Front:", SwingConstants.CENTER);
-        JTextField frontInput = new JTextField(15); // Set preferred width
+        JTextField frontInput = new JTextField(15);
         frontPanel.add(frontLabel, BorderLayout.NORTH);
         frontPanel.add(frontInput, BorderLayout.CENTER);
 
-        backPanel = new JPanel();
-        backPanel.setLayout(new BorderLayout());
+        backPanel = new JPanel(new BorderLayout());
+        backPanel.setBackground(new Color(230, 255, 230)); // Light green
         JLabel backLabel = new JLabel("Back:", SwingConstants.CENTER);
-        JTextField backInput = new JTextField(15); // Set preferred width
+        JTextField backInput = new JTextField(15);
         backPanel.add(backLabel, BorderLayout.NORTH);
         backPanel.add(backInput, BorderLayout.CENTER);
 
-        inputPanel.add(frontPanel);
-        inputPanel.add(backPanel);
-        add(inputPanel);
-
-        flashcardPanel = new JPanel();
-        flashcardPanel.setLayout(new BorderLayout());
-
-        flashcardTextField = new JTextField();
-        flashcardTextField.setEditable(false);
-        flashcardPanel.add(flashcardTextField, BorderLayout.CENTER);
-
-        JPanel flashcardButtonPanel = new JPanel();
-        nextFlashcardButton = new JButton("Next");
-        flipFlashcardButton = new JButton("Flip");
-        previousFlashcardButton = new JButton("Previous");
-        flashcardButtonPanel.add(previousFlashcardButton);
-        flashcardButtonPanel.add(nextFlashcardButton);
-        flashcardButtonPanel.add(flipFlashcardButton);
-        flashcardPanel.add(flashcardButtonPanel, BorderLayout.SOUTH);
-
-        add(flashcardPanel);
-
-        startStudyButton = new JButton("Start Study");
-        stopStudyButton = new JButton("Stop Study");
-
-        studyMethodPanel = new JPanel();
-        studyMethodPanel.setLayout(new BorderLayout());
-
-        JPanel studyMethodButtonPanel = new JPanel();
-        studyMethodButtonPanel.add(startStudyButton);
-        studyMethodButtonPanel.add(stopStudyButton);
-        studyMethodPanel.add(studyMethodButtonPanel, BorderLayout.SOUTH);
-
-        add(studyMethodPanel);
-
-        listModel = new DefaultListModel<>();
-        flashcardList = new JList<>(listModel);
-
-        JScrollPane listScrollPane = new JScrollPane(flashcardList);
-        listScrollPane.setPreferredSize(new Dimension(200, 400));
-        add(listScrollPane);
+        inputPanel.add(frontPanel, BorderLayout.NORTH);
+        inputPanel.add(backPanel, BorderLayout.CENTER);
 
         addFlashcardButton = new JButton("Add Flashcard");
-        addFlashcardButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
+        addFlashcardButton.setBackground(new Color(50, 205, 50)); // Lime Green
+        addFlashcardButton.setForeground(Color.WHITE);
+        addFlashcardButton.addActionListener(e -> {
+            if (currentCardIndex < frontSides.length) {
                 frontSides[currentCardIndex] = frontInput.getText();
                 backSides[currentCardIndex] = backInput.getText();
                 listModel.addElement(frontInput.getText() + " : " + backInput.getText());
                 frontInput.setText("");
                 backInput.setText("");
+                currentCardIndex++;
+                showCurrentCard();
             }
         });
-        inputPanel.add(addFlashcardButton);
+        inputPanel.add(addFlashcardButton, BorderLayout.SOUTH);
 
-        nextFlashcardButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                if (studying) {
-                    currentCardIndex = (currentCardIndex + 1) % listModel.size();
-                    showCurrentCard();
-                }
-            }
+        rightPanel.add(inputPanel, BorderLayout.CENTER);
+
+        // Flashcard List (Left) - Light blue background
+        listModel = new DefaultListModel<>();
+        flashcardList = new JList<>(listModel);
+        flashcardList.setBackground(new Color(240, 248, 255)); // Alice Blue
+        listScrollPane = new JScrollPane(flashcardList);
+        listScrollPane.setPreferredSize(new Dimension(200, 400));
+        leftPanel.add(listScrollPane, BorderLayout.CENTER);
+
+        // Flashcard Panel (Center) - Light yellow background
+        JPanel flashcardPanel = new JPanel(new BorderLayout());
+        flashcardPanel.setBackground(new Color(255, 255, 224)); // Light Yellow
+
+        flashcardTextField = new JTextField();
+        flashcardTextField.setEditable(false);
+        flashcardTextField.setBackground(new Color(255, 255, 224)); // Light Yellow
+        flashcardPanel.add(flashcardTextField, BorderLayout.CENTER);
+
+        JPanel flashcardButtonPanel = new JPanel();
+        flashcardButtonPanel.setBackground(new Color(255, 255, 224)); // Light Yellow
+        previousFlashcardButton = new JButton("Previous");
+        nextFlashcardButton = new JButton("Next");
+        flipFlashcardButton = new JButton("Flip");
+        flashcardButtonPanel.add(previousFlashcardButton);
+        flashcardButtonPanel.add(nextFlashcardButton);
+        flashcardButtonPanel.add(flipFlashcardButton);
+        flashcardPanel.add(flashcardButtonPanel, BorderLayout.SOUTH);
+
+        centerPanel.add(flashcardPanel, BorderLayout.CENTER);
+
+        // Study Method Panel (Center South) - Light orange background
+        studyMethodPanel = new JPanel(new BorderLayout());
+        studyMethodPanel.setBackground(new Color(255, 239, 213)); // Papaya Whip
+
+        JPanel studyMethodButtonPanel = new JPanel();
+        studyMethodButtonPanel.setBackground(new Color(255, 239, 213)); // Papaya Whip
+        startStudyButton = new JButton("Start Study");
+        stopStudyButton = new JButton("Stop Study");
+        startMultipleChoiceButton = new JButton("Start Multiple Choice");
+        stopMultipleChoiceButton = new JButton("Stop Multiple Choice");
+
+        studyMethodButtonPanel.add(startStudyButton);
+        studyMethodButtonPanel.add(stopStudyButton);
+        studyMethodButtonPanel.add(startMultipleChoiceButton);
+        studyMethodButtonPanel.add(stopMultipleChoiceButton);
+        studyMethodPanel.add(studyMethodButtonPanel, BorderLayout.CENTER);
+
+        centerPanel.add(studyMethodPanel, BorderLayout.SOUTH);
+
+        // Multiple Choice Panel (Bottom) - Light purple background
+        multipleChoicePanel = new JPanel(new BorderLayout());
+        multipleChoicePanel.setBackground(new Color(230, 230, 250)); // Lavender
+
+        questionLabel = new JLabel("Question", SwingConstants.CENTER);
+        multipleChoicePanel.add(questionLabel, BorderLayout.NORTH);
+
+        JPanel answerButtonPanel = new JPanel(new GridLayout(2, 2));
+        answerButtonPanel.setBackground(new Color(230, 230, 250)); // Lavender
+        answerButtons = new JButton[4];
+        for (int i = 0; i < 4; i++) {
+            answerButtons[i] = new JButton("Answer " + (i + 1));
+            answerButtons[i].setBackground(new Color(147, 112, 219)); // Medium Purple
+            answerButtons[i].setForeground(Color.WHITE);
+            answerButtonPanel.add(answerButtons[i]);
+        }
+        multipleChoicePanel.add(answerButtonPanel, BorderLayout.CENTER);
+
+        bottomPanel.add(multipleChoicePanel, BorderLayout.CENTER);
+
+        // Add main panels to frame
+        add(leftPanel, BorderLayout.WEST);
+        add(centerPanel, BorderLayout.CENTER);
+        add(rightPanel, BorderLayout.EAST);
+        add(bottomPanel, BorderLayout.SOUTH);
+
+        // Event Handlers
+        startStudyButton.addActionListener(e -> {
+            studying = true;
+            multipleChoiceMode = false;
+            startStudyButton.setEnabled(false);
+            stopStudyButton.setEnabled(true);
+            startMultipleChoiceButton.setEnabled(true);
+            stopMultipleChoiceButton.setEnabled(false);
+            currentCardIndex = 0;
+            showCurrentCard();
+            listScrollPane.setVisible(false);
+            revalidate();
         });
 
-        previousFlashcardButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                if (studying) {
-                    currentCardIndex = (currentCardIndex - 1 + listModel.size()) % listModel.size();
-                    showCurrentCard();
-                }
-            }
+        stopStudyButton.addActionListener(e -> {
+            studying = false;
+            startStudyButton.setEnabled(true);
+            stopStudyButton.setEnabled(false);
+            flashcardTextField.setText("");
+            listScrollPane.setVisible(true);
+            revalidate();
         });
 
-        flipFlashcardButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                if (studying) {
-                    if (flashcardTextField.getText().equals(frontSides[currentCardIndex])) {
-                        flashcardTextField.setText(backSides[currentCardIndex]);
-                    } else {
-                        flashcardTextField.setText(frontSides[currentCardIndex]);
-                    }
-                }
-            }
+        startMultipleChoiceButton.addActionListener(e -> {
+            multipleChoiceMode = true;
+            studying = false;
+            startMultipleChoiceButton.setEnabled(false);
+            stopMultipleChoiceButton.setEnabled(true);
+            startStudyButton.setEnabled(true);
+            stopStudyButton.setEnabled(false);
+            currentCardIndex = 0;
+            showMultipleChoiceQuestion();
+            listScrollPane.setVisible(false);
+            revalidate();
         });
 
-        startStudyButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                studying = true;
-                startStudyButton.setEnabled(false);
-                stopStudyButton.setEnabled(true);
-                currentCardIndex = 0;
+        stopMultipleChoiceButton.addActionListener(e -> {
+            multipleChoiceMode = false;
+            startMultipleChoiceButton.setEnabled(true);
+            stopMultipleChoiceButton.setEnabled(false);
+            questionLabel.setText("");
+            for (JButton button : answerButtons) {
+                button.setText("");
+            }
+            listScrollPane.setVisible(true);
+            revalidate();
+        });
+
+        nextFlashcardButton.addActionListener(e -> {
+            if (studying && !multipleChoiceMode) {
+                currentCardIndex = (currentCardIndex + 1) % listModel.size();
                 showCurrentCard();
             }
         });
 
-        stopStudyButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                studying = false;
-                startStudyButton.setEnabled(true);
-                stopStudyButton.setEnabled(false);
-                flashcardTextField.setText("");
+        previousFlashcardButton.addActionListener(e -> {
+            if (studying && !multipleChoiceMode) {
+                currentCardIndex = (currentCardIndex - 1 + listModel.size()) % listModel.size();
+                showCurrentCard();
             }
         });
+
+        flipFlashcardButton.addActionListener(e -> {
+            if (studying) {
+                if (flashcardTextField.getText().equals(frontSides[currentCardIndex])) {
+                    flashcardTextField.setText(backSides[currentCardIndex]);
+                } else {
+                    flashcardTextField.setText(frontSides[currentCardIndex]);
+                }
+            }
+        });
+
+        for (int i = 0; i < 4; i++) {
+            answerButtons[i].addActionListener(e -> {
+                JButton source = (JButton) e.getSource();
+                if (source.getText().equals(backSides[currentCardIndex])) {
+                    JOptionPane.showMessageDialog(null, "Correct!");
+                } else {
+                    JOptionPane.showMessageDialog(null, "Incorrect. The correct answer is: " + backSides[currentCardIndex]);
+                }
+                if (multipleChoiceMode) {
+                    currentCardIndex = (currentCardIndex + 1) % listModel.size();
+                    showMultipleChoiceQuestion();
+                }
+            });
+        }
     }
 
-    // Method to display current card
-    private void showCurrentCard() {
-        flashcardTextField.setText(frontSides[currentCardIndex]);
+    private void showMultipleChoiceQuestion() {
+        Random rand = new Random();
+        int correctIndex = rand.nextInt(4);
+        questionLabel.setText(frontSides[currentCardIndex]);
+
+        for (int i = 0; i < 4; i++) {
+            if (i == correctIndex) {
+                answerButtons[i].setText(backSides[currentCardIndex]);
+            } else {
+                int randomIndex;
+                do {
+                    randomIndex = rand.nextInt(listModel.size());
+                } while (randomIndex == currentCardIndex);
+                answerButtons[i].setText(backSides[randomIndex]);
+            }
+        }
     }
 
     public static void main(String[] args) {
-        QuizletApp app = new QuizletApp();
-        app.setVisible(true);
+        SwingUtilities.invokeLater(() -> {
+            QuizletApp app = new QuizletApp();
+            app.setVisible(true);
+        });
     }
 }
