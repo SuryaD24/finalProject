@@ -36,13 +36,11 @@ public class QuizletApp extends JFrame {
     }
 
     public QuizletApp() {
-        // Set frame properties
         setTitle("The Better Quizlet");
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        // Create header label with a gradient background
         headerLabel = new JLabel("The Better Quizlet", SwingConstants.RIGHT);
         headerLabel.setFont(new Font("Arial", Font.BOLD, 24));
         headerLabel.setForeground(Color.WHITE);
@@ -50,13 +48,11 @@ public class QuizletApp extends JFrame {
         headerLabel.setBackground(new Color(70, 130, 180)); // Steel Blue
         add(headerLabel, BorderLayout.NORTH);
 
-        // Main panels
         JPanel leftPanel = new JPanel(new BorderLayout());
         JPanel centerPanel = new JPanel(new BorderLayout());
         JPanel rightPanel = new JPanel(new BorderLayout());
         JPanel bottomPanel = new JPanel(new BorderLayout());
 
-        // Input Panel (Right) - Light green background
         inputPanel = new JPanel(new BorderLayout());
         inputPanel.setBackground(new Color(230, 255, 230)); // Light green
 
@@ -95,7 +91,6 @@ public class QuizletApp extends JFrame {
 
         rightPanel.add(inputPanel, BorderLayout.CENTER);
 
-        // Flashcard List (Left) - Light blue background
         listModel = new DefaultListModel<>();
         flashcardList = new JList<>(listModel);
         flashcardList.setBackground(new Color(240, 248, 255)); // Alice Blue
@@ -103,7 +98,6 @@ public class QuizletApp extends JFrame {
         listScrollPane.setPreferredSize(new Dimension(200, 400));
         leftPanel.add(listScrollPane, BorderLayout.CENTER);
 
-        // Flashcard Panel (Center) - Light yellow background
         JPanel flashcardPanel = new JPanel(new BorderLayout());
         flashcardPanel.setBackground(new Color(255, 255, 224)); // Light Yellow
 
@@ -124,7 +118,6 @@ public class QuizletApp extends JFrame {
 
         centerPanel.add(flashcardPanel, BorderLayout.CENTER);
 
-        // Study Method Panel (Center South) - Light orange background
         studyMethodPanel = new JPanel(new BorderLayout());
         studyMethodPanel.setBackground(new Color(255, 239, 213)); // Papaya Whip
 
@@ -143,7 +136,6 @@ public class QuizletApp extends JFrame {
 
         centerPanel.add(studyMethodPanel, BorderLayout.SOUTH);
 
-        // Multiple Choice Panel (Bottom) - Light purple background
         multipleChoicePanel = new JPanel(new BorderLayout());
         multipleChoicePanel.setBackground(new Color(230, 230, 250)); // Lavender
 
@@ -169,7 +161,6 @@ public class QuizletApp extends JFrame {
         add(rightPanel, BorderLayout.EAST);
         add(bottomPanel, BorderLayout.SOUTH);
 
-        // Event Handlers
         startStudyButton.addActionListener(e -> {
             studying = true;
             multipleChoiceMode = false;
